@@ -13,19 +13,23 @@
   "bugs": {
     "url": "https://github.com/overlookmotel/stream-chop/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "readable-stream": "^3.4.0"
+  },
   "devDependencies": {
+    "@offirmo/random": "^2.0.4",
     "@overlookmotel/eslint-config": "^4.3.2",
     "@overlookmotel/eslint-config-jest": "^2.1.0",
     "coveralls": "^3.0.6",
-    "cross-env": "^5.2.1",
-    "eslint": "^6.4.0",
+    "cross-env": "^6.0.3",
+    "eslint": "^6.5.1",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-eslint-comments": "^3.1.2",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jest": "^22.17.0",
     "eslint-plugin-node": "^10.0.0",
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "stream-gen": "^2.0.1"
   },
   "keywords": [
     "stream",
@@ -46,7 +50,7 @@
     "ci": "if [ $COVERAGE ]; then npm run coveralls; else npm test; fi"
   },
   "engines": {
-    "node": ">=8"
+    "node": ">=8.3.0"
   },
   "readmeFilename": "README.md",
   "license": "MIT"

@@ -7,9 +7,92 @@
 
 # Chop a single stream of data into a series of readable streams with rewind
 
+## What's it for
+
+The use case is:
+
+* You are transfering data from a stream to a service/process which needs it in chunks
+* Each chunk can be streamed
+* If a chunk fails to transfer, you need to be able to "rewind" to send it again
+
+An example is upload to Google Drive with the "resumable" method for large files (the use case that this package was created for).
+
 ## Usage
 
-This module is under development and not ready for use yet.
+### Installation
+
+```
+npm install stream-chop
+```
+
+### Usage
+
+```js
+const ChopStream = require('stream-chop');
+
+const inputStream = fs.createReadStream('file.mov');
+const chopStream = new ChopStream();
+
+inputStream.pipe(chopStream);
+
+// Stream 1st 1024 bytes of data to file
+const subStream1 = chopStream.chunk(0, 1024);
+const outStream1 = fs.createWriteStream('part1.mov');
+subStream1.pipe(outStream1);
+
+outStream1.on('finish', () => {
+  console.log('Done!');
+});
+```
+
+### Methods
+
+#### `.chunk( start, length )
+
+Get a stream for specified chunk of the input stream.
+
+```js
+// Get stream for 1st 256 KiB of input stream
+const subStream1 = chopStream.chunk(0, 256 * 1024);
+```
+
+The chunk is buffered internally, so `.chunk()` can be called again with same `start` if transferring the chunk fails and it needs to be sent again.
+
+When `.chunk()` is called again, any data buffered before the start point is discarded. i.e. You cannot stream 2 chunks concurrently. It must be one at a time.
+
+Calling `.chunk()` will cause any existing unfinished chunk stream to emit an `error` event and stop streaming.
+
+#### `.clearBuffer( [end] )`
+
+Clear data from internal buffer before byte `end`.
+
+If `end` is undefined, then entire buffer will be cleared.
+
+```js
+// Discard any data in buffer
+chopStream.clearBuffer();
+
+// Discard first 128 KiB of stream data if it's buffered
+chopStream.clearBuffer(1024 * 128);
+```
+
+`.chunk(1000)` automatically calls `.clearBuffer(1000)` internally.
+
+Once data has been discarded from the buffer, the stream can no longer be "rewound" to stream that data out again.
+
+### Properties
+
+#### `.bufferStart`
+
+Returns byte position of start of buffer.
+
+#### `.bufferEnd`
+
+Returns byte position of end of buffer.
+
+#### `.bufferLength`
+
+Returns number of bytes in buffer.
 
 ## Tests
 
